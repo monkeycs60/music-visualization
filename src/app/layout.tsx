@@ -1,4 +1,5 @@
 import '../styles/globals.css';
+import { ReactQueryWrapper, ReactQueryDevtoolsWrapper } from './providers';
 
 export const metadata = {
 	title: 'The new Windows Media Player',
@@ -12,7 +13,12 @@ export default function RootLayout({
 }) {
 	return (
 		<html lang="en">
-			<body>{children}</body>
+			<body>
+				<ReactQueryWrapper>
+					{children}
+					<ReactQueryDevtoolsWrapper />
+				</ReactQueryWrapper>
+			</body>
 		</html>
 	);
 }
