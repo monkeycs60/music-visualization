@@ -1,6 +1,5 @@
-'use client';
-
 import clsx from 'clsx';
+import { MusicPlayer } from './MusicPlayer';
 
 export default function Home() {
 	return (
@@ -8,8 +7,9 @@ export default function Home() {
 			<h1 className={clsx(
 				'text-4xl font-bold text-yellow-600',
 				'sm:text-2xl sm:font-light',
-        'lg:text-6xl lg:font-bold lg:text-pink-600',
+        		'lg:text-6xl lg:font-bold lg:text-pink-600',
 			)} >hello</h1>
+			<MusicPlayer />
 		</div>
 	);
 }
