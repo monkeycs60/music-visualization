@@ -1,6 +1,9 @@
 import { MusicType, PlaylistDataSchema } from './types';
 
-// Deezer fetching avoiding the CORS issue
+// DEEZER CALL WITH SDK !!
+
+// DEEZER CALL AVOIDING CARS ISSUE WITH GPT MAGIC !!
+
 export const fetchPlaylist = async (): Promise<MusicType[]> => {
   const playlistUrl = 'https://api.deezer.com/playlist/11240287344';
 
@@ -34,6 +37,12 @@ export const fetchPlaylist = async (): Promise<MusicType[]> => {
   });
 };
 
+export function jsonpCallback(callbackName: string, data: unknown) {
+  (window as any)[callbackName](data);
+}
+
+// FIRST CALL TO DEEZER BUT CORS ISSUE !!
+
 // export const fetchPlaylist = async () => {
 //   const playlistUrl = 'https://api.deezer.com/playlist/11240287344';
 //   const response = await fetch(playlistUrl, {
@@ -44,7 +53,3 @@ export const fetchPlaylist = async (): Promise<MusicType[]> => {
 //   const playlist: MusicType[] = parsedData.tracks.data;
 //   return playlist;
 // };
-
-export function jsonpCallback(callbackName: string, data: unknown) {
-  (window as any)[callbackName](data);
-}
