@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
-import { fetchPlaylist } from '@/services/fetchPlaylist';
-import { MusicType } from '@/services/types';
+import { fetchPlaylist } from '@/app/api/deezer/fetchPlaylist';
+import { MusicType } from '@/app/api/deezer/types';
 
 const useFetchPlaylist = () => {
     const { data, error, isLoading } = useQuery<MusicType[]>(
