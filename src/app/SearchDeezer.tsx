@@ -3,6 +3,7 @@
 import clsx from 'clsx';
 import { useState, useEffect, useCallback } from 'react';
 import debounce from 'lodash.debounce';
+import { deezerSearchApi } from '@/utils/deezerSearchApi';
 
 declare global {
   interface Window {
@@ -15,18 +16,7 @@ const SearchDeezer = () => {
   const [trackUrl, setTrackUrl] = useState<string | null>(null);
 
   const search = useCallback((searchQuery: string) => {
-    if (window.DZ && searchQuery) {
-      window.DZ.api(`search?q=${searchQuery}`, (response: any) => {
-        console.log(response);
-        if (response.data && response.data.length > 0) {
-          const trackId = response.data[0].id;
-          window.DZ.api(`track/${trackId}`, (trackResponse: any) => {
-            console.log(trackResponse);
-            setTrackUrl(trackResponse.preview);
-          });
-        }
-      });
-    }
+   deezerSearchApi({ searchQuery, setTrackUrl });
   }, [setTrackUrl]);
 
  useEffect(() => {
