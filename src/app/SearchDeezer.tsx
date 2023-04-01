@@ -4,6 +4,7 @@ import clsx from 'clsx';
 import { useState, useEffect, useCallback } from 'react';
 import debounce from 'lodash.debounce';
 import { deezerSearchApi } from '@/utils/deezerSearchApi';
+import MediaPlayer from './MediaPlayer';
 
 declare global {
   interface Window {
@@ -39,7 +40,11 @@ const SearchDeezer = () => {
           'h-10 rounded-lg border-2 border-gray-300 bg-white px-5 pr-16 text-sm focus:outline-none',
           'focus:border-blue-500',
         )}
-      />
+        />
+      {trackUrl && (
+        <MediaPlayer trackUrl={trackUrl} />
+      )}
+
     </div>
   );
 };
