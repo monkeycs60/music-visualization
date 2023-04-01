@@ -4,7 +4,7 @@ import clsx from 'clsx';
 import { useState, useEffect, useCallback } from 'react';
 import debounce from 'lodash.debounce';
 import { deezerSearchApi } from '@/utils/deezerSearchApi';
-import MediaPlayer from './MediaPlayer';
+import AudioPlayer from './AudioPlayer';
 
 declare global {
   interface Window {
@@ -42,7 +42,7 @@ const SearchDeezer = () => {
         )}
         />
       {trackUrl && (
-        <MediaPlayer trackUrl={trackUrl} />
+        <AudioPlayer trackUrl={trackUrl} />
       )}
 
     </div>
