@@ -31,7 +31,9 @@ const SearchDeezer = () => {
   };
 
   return (
-    <div>
+    <div className={clsx(
+      'flex h-[80vh] w-full flex-col items-center justify-center',
+    )}>
       <input
         type="text"
         value={searchQuery}
