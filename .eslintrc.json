@@ -9,6 +9,7 @@
     "padded-blocks": ["error", "never"],
     "no-trailing-spaces": ["error", { "skipBlankLines": true }],
     "react/no-unescaped-entities": "off",
-    "array-bracket-spacing": ["error", "never"]
+    "array-bracket-spacing": ["error", "never"],
+    "indent": ["error", 3]
   }
 }
