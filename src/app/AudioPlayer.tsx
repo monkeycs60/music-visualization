@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { arc } from 'd3';
 import { useState } from 'react';
-import ParticleChoreography from './particleChoregraphy';
+import ParticleChoreography from '@/components/ParticleChoregraphy';
 
 const arcBuilder = arc();
 
