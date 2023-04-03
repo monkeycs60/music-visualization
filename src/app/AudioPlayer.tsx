@@ -22,9 +22,27 @@ const AudioPlayer = ({  trackInfo }: MediaPlayerProps) => {
    const [audioSource, setAudioSource] = useState<AudioBufferSourceNode | null>(null);
    const [isPlaying, setIsPlaying] = useState(false);
    const feTurbulenceRef = useRef<SVGFETurbulenceElement>(null);
+   const [wasPlaying, setWasPlaying] = useState(false);
+
+   const playNewTrack = async () => {
+   // Stop the current audio playback
+      if (audioSource) {
+         audioSource.stop();
+      }
+
+      // Reset the audio context, source and playback states
+      setAudioContext(null);
+      setAudioSource(null);
+      setIsPlaying(false);
+
+      // Call togglePlayPause to start playing the new track
+      await togglePlayPause();
+   };
 
    useEffect(() => {
-   // Stop the current audio playback
+      // Save the previous playing state
+      setWasPlaying(isPlaying);
+      // Stop the current audio playback
       if (audioSource) {
          audioSource.stop();
       }
@@ -37,6 +55,12 @@ const AudioPlayer = ({  trackInfo }: MediaPlayerProps) => {
       // Now call togglePlayPause to start playing the new track
       togglePlayPause();
    }, [trackInfo]);
+
+   useEffect(() => {
+      if (wasPlaying) {
+         togglePlayPause();
+      }
+   }, [wasPlaying]);
   
    const togglePlayPause = async () => {
       if (!audioContext) {
