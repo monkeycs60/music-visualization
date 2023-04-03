@@ -1,5 +1,6 @@
 import '../styles/globals.css';
 import '../../public/favicon.ico';
+import { Providers } from '@/redux/provider';
 
 export const metadata = {
    title: 'Tunescape',
@@ -15,7 +16,9 @@ export default function RootLayout({
       <html lang="en">
          <link rel="icon" type="image/x-icon" href="/favicon.ico" />
          <body>
-            {children}
+            <Providers>
+               {children}
+            </Providers>
          </body>
       </html>
    );

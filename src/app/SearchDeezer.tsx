@@ -6,6 +6,7 @@ import debounce from 'lodash.debounce';
 import { deezerSearchApi } from '@/utils/deezerSearchApi';
 import AudioPlayer from './AudioPlayer';
 import MusicList from './MusicList';
+import { useDispatch, useSelector } from 'react-redux';
 
 declare global {
   interface Window {
@@ -18,6 +19,10 @@ const SearchDeezer = () => {
    const [searchResults, setSearchResults] = useState([]);
    const [trackUrl, setTrackUrl] = useState<string | null>(null);
    const [selectedTrack, setSelectedTrack] = useState<any | null>(null);
+
+   const dispatch = useDispatch();
+   const trackBan = useSelector((state: any) => state);
+   console.log('trackInfo REDUX', trackBan);
 
    const search = useCallback((searchQuery: string) => {
       deezerSearchApi({ searchQuery, setSearchResults, setTrackUrl });
