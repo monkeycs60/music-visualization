@@ -1,17 +1,19 @@
 import clsx from 'clsx';
 import { arc } from 'd3';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import ProgressBar from '@/components/ProgressBar';
 import AudioBars from './AudioBars';
 import ThreeDAudioVisualizer from './ThreeDAudioVisualizer';
+import { motion } from 'framer-motion';
+import debounce from 'lodash.debounce';
 
 const arcBuilder = arc();
 
 type MediaPlayerProps = {
-  trackUrl: string;
+   trackInfo: any;
 };
 
-const AudioPlayer = ({ trackUrl }: MediaPlayerProps) => {
+const AudioPlayer = ({  trackInfo }: MediaPlayerProps) => {
    const [rawData, setRawData] = useState<number[]>([]);
    const [currentTime, setCurrentTime] = useState(0);
    const [duration, setDuration] = useState(0);
@@ -21,9 +23,24 @@ const AudioPlayer = ({ trackUrl }: MediaPlayerProps) => {
    const [isPlaying, setIsPlaying] = useState(false);
    const feTurbulenceRef = useRef<SVGFETurbulenceElement>(null);
 
+   useEffect(() => {
+   // Stop the current audio playback
+      if (audioSource) {
+         audioSource.stop();
+      }
+
+      // Reset the audio context, source and playback states
+      setAudioContext(null);
+      setAudioSource(null);
+      setIsPlaying(false);
+
+      // Now call togglePlayPause to start playing the new track
+      togglePlayPause();
+   }, [trackInfo]);
+  
    const togglePlayPause = async () => {
       if (!audioContext) {
-         const res = await fetch(trackUrl);
+         const res = await fetch(trackInfo.preview);
          const byteArray = await res.arrayBuffer();
 
          const context = new AudioContext();
@@ -108,9 +125,13 @@ const AudioPlayer = ({ trackUrl }: MediaPlayerProps) => {
 
    return (
       <>
-         <div
+         <motion.div
+            initial={{ opacity: 0, x: 200 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1 }}
             className={clsx(
-               'relative flex h-3/4 w-full flex-col items-center justify-center rounded-lg bg-gray-400 p-16',
+               'relative flex h-full w-1/2 flex-col items-center justify-center rounded-lg bg-gray-400 p-16',
             )}
          >
             <svg
@@ -186,8 +207,9 @@ const AudioPlayer = ({ trackUrl }: MediaPlayerProps) => {
                   fontSize="48"
                   fontWeight="bold"
                   fill="white"
-                  // pointerEvents="none"
-                  onClick={togglePlayPause}
+                  style={{ cursor: 'pointer'}}
+                  onClick={() =>
+                     togglePlayPause()}
 
                >
                   {isPlaying ? 'Play' : '▶'}
@@ -201,7 +223,7 @@ const AudioPlayer = ({ trackUrl }: MediaPlayerProps) => {
                   ? '0:00'
                   : formatTime(duration - currentTime)}
             </div>
-         </div>
+         </motion.div>
       </>
    );
 };

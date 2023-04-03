@@ -17,6 +17,7 @@ const SearchDeezer = () => {
    const [searchQuery, setSearchQuery] = useState('');
    const [searchResults, setSearchResults] = useState([]);
    const [trackUrl, setTrackUrl] = useState<string | null>(null);
+   const [selectedTrack, setSelectedTrack] = useState<any | null>(null);
 
    const search = useCallback((searchQuery: string) => {
       deezerSearchApi({ searchQuery, setSearchResults, setTrackUrl });
@@ -32,28 +33,35 @@ const SearchDeezer = () => {
       setSearchQuery(e.target.value);
    };
 
+   const handleResultClick = (trackInfo: any) => {
+      setSelectedTrack(trackInfo);
+   };
+
    return (
       <div className={clsx(
-         'mt-12 flex h-full w-full flex-col items-start justify-start gap-12',
+         'z-10 mt-12 flex h-[85%] w-full items-center justify-between',
       )}>
-         <input
-            type="text"
-            value={searchQuery}
-            onChange={handleInputChange}
-            className={clsx(
-               'h-10 w-1/5 rounded-lg border-2 border-gray-300 bg-white px-5 pr-16 text-sm focus:outline-none',
-               'focus:border-blue-500',
-            )}
-         />
-         {
-            searchResults && (
-               <MusicList searchResults={searchResults}  />
-            )
+         <div className='flex h-full w-1/2 flex-col items-start justify-start'>
+            <input
+               type="text"
+               value={searchQuery}
+               onChange={handleInputChange}
+               className={clsx(
+                  'font-xl h-10 w-2/3 border-2 border-gray-300 bg-yellow-50 p-8 text-xl placeholder:text-2xl placeholder:text-black focus:outline-none',
+                  'focus:border-fuchsia-400',
+               )}
+               placeholder='Search for a song'
+            />
+            {
+               searchResults && (
+                  <MusicList searchResults={searchResults} onResultClick={handleResultClick}  />
+               )
 
-         }
-         {/* {trackUrl && (
-            <AudioPlayer trackUrl={trackUrl} />
-         )} */}
+            }
+         </div>
+         {selectedTrack && (
+            <AudioPlayer trackInfo={selectedTrack}  />
+         )}
 
       </div>
    );

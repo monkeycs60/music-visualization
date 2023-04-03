@@ -1,5 +1,4 @@
 import clsx from 'clsx';
-import { MusicPlayer } from './MusicPlayer';
 import DeezerSDK from './DeezerSDK';
 import SearchDeezer from './SearchDeezer';
 
