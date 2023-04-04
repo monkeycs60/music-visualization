@@ -1,6 +1,6 @@
 import '../styles/globals.css';
 import '../../public/favicon.ico';
-import { Providers } from '@/app/redux/provider';
+import { Providers } from '@/redux/provider';
 
 export const metadata = {
    title: 'Tunescape',

@@ -6,8 +6,8 @@ import debounce from 'lodash.debounce';
 import AudioPlayer from './AudioPlayer';
 import MusicList from './MusicList';
 import { useDispatch, useSelector } from 'react-redux';
-import { audioSliceProps } from '@/app/redux/types';
-import { setQuerySearch, setTrackInfo, resetStore } from '@/app/redux/audioSlice';
+import { audioSliceProps } from '@/redux/types';
+import { setQuerySearch, setTrackInfo, resetStore } from '@/redux/audioSlice';
 
 declare global {
   interface Window {
@@ -58,8 +58,6 @@ const SearchDeezer = () => {
          debouncedSearch.cancel(); // Cancel the debounced function when the component unmounts or QuerySearch changes
       };
    }, [QuerySearch, dispatch, handleInputChange]);
-
-   //if window reloads, clean the redux store
 
    return (
       <div className={clsx(

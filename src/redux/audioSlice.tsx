@@ -4,6 +4,7 @@ import { HYDRATE } from 'next-redux-wrapper';
 const initialState = {
    QuerySearch: '',
    trackInfo: null,
+   audioSource: null,
    rawData: [],
    duration: 0,
    currentTime: 0,

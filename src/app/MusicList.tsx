@@ -1,8 +1,8 @@
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
 import { useDispatch, useSelector } from 'react-redux';
-import { audioSliceProps } from '@/app/redux/types';
-import { setQuerySearch, setTrackInfo } from '@/app/redux/audioSlice';
+import { audioSliceProps } from '@/redux/types';
+import { setQuerySearch, setTrackInfo } from '@/redux/audioSlice';
 
 const MusicList = () => {
    const dispatch = useDispatch();
