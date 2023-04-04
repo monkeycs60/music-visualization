@@ -7,13 +7,14 @@ import { setQuerySearch, setTrackInfo } from '@/app/redux/audioSlice';
 const MusicList = () => {
    const dispatch = useDispatch();
    // (redux store) The 8 tracks infos returned by the Deezer API
-   const trackInfo = useSelector((state: audioSliceProps) => state.trackInfo);
+   const trackInfo = useSelector((state: audioSliceProps) => state.audio.trackInfo);
 
    const convertDuration = (duration: number) => {
       const minutes = Math.floor(duration / 60);
       const seconds = Math.floor(duration % 60);
       return `${minutes}:${seconds.toString().padStart(2, '0')}`;
    };
+   
    return (
       <motion.div
          initial={{ opacity: 0 }}
@@ -39,8 +40,7 @@ const MusicList = () => {
                      )}>
                         <img src={result.album.cover_medium} alt={result.title} className={clsx(
                            'max-w-16 max-h-16 rounded-lg'
-                        )}
-                        />
+                        )} />
                         <div className='font-futuristic'>
                            <p>{result.title}</p>
                            <p className='font-thin text-black/60'>

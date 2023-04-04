@@ -3,7 +3,6 @@
 import clsx from 'clsx';
 import { useState, useEffect, useCallback } from 'react';
 import debounce from 'lodash.debounce';
-import { deezerSearchApi } from '@/utils/deezerSearchApi';
 import AudioPlayer from './AudioPlayer';
 import MusicList from './MusicList';
 import { useDispatch, useSelector } from 'react-redux';
@@ -17,7 +16,6 @@ declare global {
 }
 
 const SearchDeezer = () => {
-   const [inputLength, setInputLength] = useState(0);
    const dispatch = useDispatch();
    const reduxLog = useSelector((state: audioSliceProps) => state);
    console.log('trackInfo REDUX', reduxLog);
@@ -37,7 +35,6 @@ const SearchDeezer = () => {
    const handleInputChange = useCallback(
       (e: React.ChangeEvent<HTMLInputElement>) => {
          dispatch(setQuerySearch(e.target.value));
-         setInputLength(e.target.value.length);
       },
       [dispatch],
    );
@@ -60,7 +57,7 @@ const SearchDeezer = () => {
       return () => {
          debouncedSearch.cancel(); // Cancel the debounced function when the component unmounts or QuerySearch changes
       };
-   }, [QuerySearch, dispatch, handleInputChange, inputLength]);
+   }, [QuerySearch, dispatch, handleInputChange]);
 
    //if window reloads, clean the redux store
 
@@ -81,9 +78,9 @@ const SearchDeezer = () => {
             />
             {
                
-               // trackInfo && (
-               //    <MusicList />
-               // )
+               trackInfo && (
+                  <MusicList />
+               )
 
             }
          </div>
