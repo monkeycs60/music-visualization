@@ -12,7 +12,6 @@ export default function Home() {
          )} >Tunescape</h1>
 		 <DeezerSDK />
 		 <SearchDeezer />
-         {/* <MusicPlayer /> */}
       </div>
    );
 }

@@ -7,6 +7,8 @@ import { deezerSearchApi } from '@/utils/deezerSearchApi';
 import AudioPlayer from './AudioPlayer';
 import MusicList from './MusicList';
 import { useDispatch, useSelector } from 'react-redux';
+import { audioSliceProps } from '@/app/redux/types';
+import { setQuerySearch, setTrackInfo, resetStore } from '@/app/redux/audioSlice';
 
 declare global {
   interface Window {
@@ -15,32 +17,52 @@ declare global {
 }
 
 const SearchDeezer = () => {
-   const [searchQuery, setSearchQuery] = useState('');
-   const [searchResults, setSearchResults] = useState([]);
-   const [trackUrl, setTrackUrl] = useState<string | null>(null);
-   const [selectedTrack, setSelectedTrack] = useState<any | null>(null);
-
+   const [inputLength, setInputLength] = useState(0);
    const dispatch = useDispatch();
-   const trackBan = useSelector((state: any) => state);
-   console.log('trackInfo REDUX', trackBan);
+   const reduxLog = useSelector((state: audioSliceProps) => state);
+   console.log('trackInfo REDUX', reduxLog);
 
-   const search = useCallback((searchQuery: string) => {
-      deezerSearchApi({ searchQuery, setSearchResults, setTrackUrl });
-   }, [setTrackUrl]);
-
+   // reset the redux store on refresh
    useEffect(() => {
-      const debouncedSearch = debounce((searchQuery: string) => search(searchQuery), 500);
-      debouncedSearch(searchQuery);
-      return () => debouncedSearch.cancel();
-   }, [searchQuery, search]);
+      dispatch(resetStore());
+   }, [dispatch]);
 
-   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      setSearchQuery(e.target.value);
-   };
+   // (redux store) The search query user types in the input
+   const QuerySearch = useSelector((state: audioSliceProps) => state.audio.QuerySearch);
 
-   const handleResultClick = (trackInfo: any) => {
-      setSelectedTrack(trackInfo);
-   };
+   // (redux store) The 8 tracks infos returned by the Deezer API
+   const trackInfo = useSelector((state: audioSliceProps) => state.audio.trackInfo);
+
+   // Handle the input change
+   const handleInputChange = useCallback(
+      (e: React.ChangeEvent<HTMLInputElement>) => {
+         dispatch(setQuerySearch(e.target.value));
+         setInputLength(e.target.value.length);
+      },
+      [dispatch],
+   );
+
+   // Debounce the search query to avoid too many API calls
+   useEffect(() => {
+      const debouncedSearch = debounce(() => {
+         if (window.DZ) {
+            // API call to Deezer - search for 8 tracks matching the search query
+            window.DZ.api(`search?q=${QuerySearch}`, (response: any) => {
+               if (response.data && response.data.length > 0) {
+               // put the 8 tracks infos in the redux store
+                  dispatch(setTrackInfo(response.data.slice(0, 8)));
+               }
+            });
+         }
+      }, 500);
+
+      debouncedSearch();
+      return () => {
+         debouncedSearch.cancel(); // Cancel the debounced function when the component unmounts or QuerySearch changes
+      };
+   }, [QuerySearch, dispatch, handleInputChange, inputLength]);
+
+   //if window reloads, clean the redux store
 
    return (
       <div className={clsx(
@@ -49,7 +71,7 @@ const SearchDeezer = () => {
          <div className='flex h-full w-1/2 flex-col items-start justify-start'>
             <input
                type="text"
-               value={searchQuery}
+               value={QuerySearch}
                onChange={handleInputChange}
                className={clsx(
                   'font-xl h-10 w-2/3 border-2 border-gray-300 bg-yellow-50 p-8 text-xl placeholder:text-2xl placeholder:text-black focus:outline-none',
@@ -58,15 +80,16 @@ const SearchDeezer = () => {
                placeholder='Search for a song'
             />
             {
-               searchResults && (
-                  <MusicList searchResults={searchResults} onResultClick={handleResultClick}  />
-               )
+               
+               // trackInfo && (
+               //    <MusicList />
+               // )
 
             }
          </div>
-         {selectedTrack && (
+         {/* {QuerySearch && (
             <AudioPlayer trackInfo={selectedTrack}  />
-         )}
+         )} */}
 
       </div>
    );

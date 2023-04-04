@@ -1,19 +1,25 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { HYDRATE } from 'next-redux-wrapper';
 
+const initialState = {
+   QuerySearch: '',
+   trackInfo: null,
+   rawData: [],
+   duration: 0,
+   currentTime: 0,
+   isPlaying: false,
+   shouldPlay: false,
+   wasPlaying: false,
+   arcRadius: 50,
+};
+
 export const audioSlice = createSlice({
    name: 'audioDatas',
-   initialState: {
-      trackInfo: null,
-      duration: 0,
-      currentTime: 0,
-      isPlaying: false,
-      shouldPlay: false,
-      wasPlaying: false,
-      arcRadius: 50,
-      rawData: [],
-   },
+   initialState: initialState,
    reducers: {
+      setQuerySearch: (state, action) => {
+         state.QuerySearch = action.payload;
+      },
       setTrackInfo: (state, action) => {
          state.trackInfo = action.payload;
       },
@@ -38,6 +44,7 @@ export const audioSlice = createSlice({
       setRawData: (state, action) => {
          state.rawData = action.payload;
       },
+      resetStore: () => initialState,
    },
    extraReducers: {
       [HYDRATE]: (state, action) => {
@@ -50,6 +57,7 @@ export const audioSlice = createSlice({
 });
 
 export const {
+   setQuerySearch,
    setTrackInfo,
    setDuration,
    setCurrentTime,
@@ -58,6 +66,7 @@ export const {
    setWasPlaying,
    setArcRadius,
    setRawData,
+   resetStore,
 } = audioSlice.actions;
 
 export default audioSlice.reducer;
