@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, AnyAction } from '@reduxjs/toolkit';
 import { HYDRATE } from 'next-redux-wrapper';
 
 const initialState = {
@@ -47,13 +47,10 @@ export const audioSlice = createSlice({
       },
       resetStore: () => initialState,
    },
-   extraReducers: {
-      [HYDRATE]: (state, action) => {
-         return {
-            ...state,
-            ...action.payload.audio,
-         };
-      },
+   extraReducers: (builder) => {
+      builder.addCase(HYDRATE, (state, action: AnyAction) => {
+         return { ...state, ...action.payload.filmsList };
+      });
    },
 });
 
