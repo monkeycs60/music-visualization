@@ -1,10 +1,14 @@
+import { useDispatch, useSelector } from 'react-redux';
+
 type ProgressBarProps = {
-  currentTime: number;
-  duration: number;
   width: number;
 };
 
-const ProgressBar = ({ currentTime, duration, width }: ProgressBarProps) => {
+const ProgressBar = ({  width }: ProgressBarProps) => {
+   const dispatch = useDispatch();
+   const currentTime = useSelector((state: any) => state.audio.currentTime);
+   const duration = useSelector((state: any) => state.audio.duration);
+
    if (duration === 0) {
       return null;
    }

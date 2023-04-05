@@ -5,6 +5,9 @@ import ProgressBar from '@/components/ProgressBar';
 import AudioBars from './AudioBars';
 import ThreeDAudioVisualizer from './ThreeDAudioVisualizer';
 import { motion } from 'framer-motion';
+import { useDispatch, useSelector } from 'react-redux';
+import { setDuration, setQuerySearch, setTrackInfo, setCurrentTime, setArcRadius, setRawData, setIsPlaying, setAudioSource, setAudioContext } from '@/redux/audioSlice';
+import { audioSliceProps } from '@/redux/types';
 import debounce from 'lodash.debounce';
 
 const arcBuilder = arc();
@@ -13,52 +16,28 @@ type MediaPlayerProps = {
    trackInfo: any;
 };
 
-const AudioPlayer = ({  trackInfo }: MediaPlayerProps) => {
-   const [rawData, setRawData] = useState<number[]>([]);
-   const [currentTime, setCurrentTime] = useState(0);
-   const [duration, setDuration] = useState(0);
-   const [arcRadius, setArcRadius] = useState(50);
-   const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
-   const [audioSource, setAudioSource] = useState<AudioBufferSourceNode | null>(null);
-   const [isPlaying, setIsPlaying] = useState(false);
+const AudioPlayer = () => {
    const feTurbulenceRef = useRef<SVGFETurbulenceElement>(null);
-   const [shouldPlay, setShouldPlay] = useState(false);
-   const [wasPlaying, setWasPlaying] = useState(false);
+   const dispatch = useDispatch();
 
-   const playNewTrack = async () => {
-   // Stop the current audio playback
-      if (audioSource) {
-         audioSource.stop();
-      }
-
-      // Reset the audio context, source and playback states
-      setAudioContext(null);
-      setAudioSource(null);
-      setIsPlaying(false);
-
-      // Call togglePlayPause to start playing the new track
-      await togglePlayPause();
-   };
-
-   useEffect(() => {
-      if (isPlaying) {
-         playNewTrack();
-      } else {
-      // Stop the current audio playback
-         if (audioSource) {
-            audioSource.stop();
-         }
-
-         // Reset the audio context, source and playback states
-         setAudioContext(null);
-         setAudioSource(null);
-         setIsPlaying(false);
-      }
-   }, [trackInfo]);
+   // (redux store) The 8 tracks infos returned by the Deezer API
+   const trackInfo = useSelector((state: audioSliceProps) => state.audio.trackInfo);
+   // (redux store) The duration of the audio track
+   const durationRedux = useSelector((state: audioSliceProps) => state.audio.duration);
+   // (redux store) The raw datas of the audio track (used to draw the audio visualizer)
+   const rawData = useSelector((state: audioSliceProps) => state.audio.rawData);
+   // (redux store) The current clicked track
+   const clickedTrack = useSelector((state: audioSliceProps) => state.audio.clickedTrack);
+   // (redux store) The current time of the audio track
+   const currentTimeRedux = useSelector((state: audioSliceProps) => state.audio.currentTime);
+   const arcRadiusRedux = useSelector((state: audioSliceProps) => state.audio.arcRadius);
+   const isPlayingRedux = useSelector((state: audioSliceProps) => state.audio.isPlaying);
+   const audioSourceRedux = useSelector((state: audioSliceProps) => state.audio.audioSource);
+   const audioContextRedux = useSelector((state: audioSliceProps) => state.audio.audioContext);
   
    const togglePlayPause = async () => {
-      if (!audioContext) {
-         const res = await fetch(trackInfo.preview);
+      if (!audioContextRedux) {
+         const res = await fetch(clickedTrack.preview);
          const byteArray = await res.arrayBuffer();
 
          const context = new AudioContext();
@@ -66,7 +45,7 @@ const AudioPlayer = ({  trackInfo }: MediaPlayerProps) => {
 
          const source = context.createBufferSource();
          source.buffer = audioBuffer;
-         setDuration(audioBuffer.duration);
+         dispatch(setDuration(audioBuffer.duration));
 
          const analyzer = context.createAnalyser();
          analyzer.fftSize = 512;
@@ -80,10 +59,14 @@ const AudioPlayer = ({  trackInfo }: MediaPlayerProps) => {
 
          // realtime update of the current time
          const updateCurrentTime = () => {
-            setCurrentTime(context.currentTime);
+            const trackCurrentTime = context.currentTime;
+            dispatch(setCurrentTime(trackCurrentTime));
          };
 
-         const updateBaseFrequency = (rawData: number[]) => {
+         const updateBaseFrequency = () => {
+            if (rawData.length === 0) {
+               return;
+            }
             const avgFreq = rawData.reduce((acc, val) => acc + val, 0) / rawData.length;
             const normalizedFreq = avgFreq / 255;
             const baseFrequency = 0.01 + normalizedFreq * 0.1; // Ajustez le multiplicateur pour obtenir l'effet souhaité
@@ -96,14 +79,14 @@ const AudioPlayer = ({  trackInfo }: MediaPlayerProps) => {
             const minRadius = 50; // Rayon minimum
             const maxRadius = 80; // Rayon maximum
             const newArcRadius = minRadius + normalizedFreq * (maxRadius - minRadius);
-            setArcRadius(newArcRadius);
+            dispatch(setArcRadius(newArcRadius));
          };
 
          const update = () => {
             analyzer.getByteFrequencyData(dataArray);
             const numberArray = Array.from(dataArray);
-            setRawData(numberArray);
-            updateBaseFrequency(numberArray);
+            dispatch(setRawData(numberArray));
+            updateBaseFrequency();
             const avgFreq = dataArray.reduce((acc, val) => acc + val, 0) / bufferLength;
             requestAnimationFrame(update);
             updateCurrentTime();
@@ -111,27 +94,58 @@ const AudioPlayer = ({  trackInfo }: MediaPlayerProps) => {
          requestAnimationFrame(update);
 
          source.onended = () => {
-            setIsPlaying(false);
-            setAudioContext(null);
-            setAudioSource(null);
-            setArcRadius(80);
+            dispatch(setIsPlaying(false));
+            dispatch(setAudioContext(null));
+            dispatch(setAudioSource(null));
+            dispatch(setArcRadius(80));
          };
 
-         setAudioContext(context);
-         setAudioSource(source);
-         setIsPlaying(true);
+         dispatch(setAudioContext(context));
+         dispatch(setAudioSource(source));
+         dispatch(setIsPlaying(true));
       } else {
-         if (isPlaying) {
-            audioContext.suspend().then(() => {
-               setIsPlaying(false);
+         if (isPlayingRedux) {
+            audioContextRedux.suspend().then(() => {
+               dispatch(setIsPlaying(false));
             });
          } else {
-            audioContext.resume().then(() => {
-               setIsPlaying(true);
+            audioContextRedux.resume().then(() => {
+               dispatch(setIsPlaying(true));
             });
          }
       }
    };
+
+   // const playNewTrack = async () => {
+   // // Stop the current audio playback
+   //    if (audioSource) {
+   //       audioSource.stop();
+   //    }
+
+   //    // Reset the audio context, source and playback states
+   //    setAudioContext(null);
+   //    setAudioSource(null);
+   //    setIsPlaying(false);
+
+   //    // Call togglePlayPause to start playing the new track
+   //    await togglePlayPause();
+   // };
+
+   // useEffect(() => {
+   //    if (isPlaying) {
+   //       playNewTrack();
+   //    } else {
+   //    // Stop the current audio playback
+   //       if (audioSource) {
+   //          audioSource.stop();
+   //       }
+
+   //       // Reset the audio context, source and playback states
+   //       setAudioContext(null);
+   //       setAudioSource(null);
+   //       setIsPlaying(false);
+   //    }
+   // }, [trackInfo]);
 
    const formatTime = (time: number) => {
       const minutes = Math.floor(time / 60);
@@ -205,8 +219,8 @@ const AudioPlayer = ({  trackInfo }: MediaPlayerProps) => {
                   <path
                      d={
                         arcBuilder({
-                           innerRadius: arcRadius - 2,
-                           outerRadius: arcRadius + 5,
+                           innerRadius: arcRadiusRedux - 2,
+                           outerRadius: arcRadiusRedux + 5,
                            startAngle: 0,
                            endAngle: 2 * Math.PI,
                         }) || undefined
@@ -230,16 +244,17 @@ const AudioPlayer = ({  trackInfo }: MediaPlayerProps) => {
                      togglePlayPause()}
 
                >
-                  {isPlaying ? 'Play' : '▶'}
+                  {
+                     isPlayingRedux ? 'Play' : '▶'}
                </text>
             </svg>
-            <AudioBars data={rawData} width={400} />
-            <ThreeDAudioVisualizer rawData={rawData} />
-            <ProgressBar currentTime={currentTime} duration={duration} width={200} />
+            <AudioBars width={400} />
+            <ThreeDAudioVisualizer />
+            <ProgressBar width={200} />
             <div>
-               {formatTime(duration - currentTime) < '0:00'
+               {formatTime(durationRedux - currentTimeRedux) < '0:00'
                   ? '0:00'
-                  : formatTime(duration - currentTime)}
+                  : formatTime(durationRedux - currentTimeRedux)}
             </div>
          </motion.div>
       </>

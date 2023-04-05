@@ -2,13 +2,17 @@ import clsx from 'clsx';
 import { motion } from 'framer-motion';
 import { useDispatch, useSelector } from 'react-redux';
 import { audioSliceProps } from '@/redux/types';
-import { setQuerySearch, setTrackInfo } from '@/redux/audioSlice';
+import { setQuerySearch, setTrackInfo, setClickedTrack } from '@/redux/audioSlice';
 
 const MusicList = () => {
    const dispatch = useDispatch();
    // (redux store) The 8 tracks infos returned by the Deezer API
    const trackInfo = useSelector((state: audioSliceProps) => state.audio.trackInfo);
 
+   // (redux store) the infos of the clicked track
+   const clickedTrack = useSelector((state: audioSliceProps) => state.audio.clickedTrack);
+   // console.log(clickedTrack.preview, 'track cliquée');
+   
    const convertDuration = (duration: number) => {
       const minutes = Math.floor(duration / 60);
       const seconds = Math.floor(duration % 60);
@@ -33,7 +37,9 @@ const MusicList = () => {
                         'hover:bg-yellow-100',
                      )
                   }
-                  // onClick={() => onResultClick(result)}
+                  onClick={() =>
+                     dispatch(setClickedTrack(result))
+                  }
                   >
                      <div className={clsx(
                         'flex items-center gap-12 '

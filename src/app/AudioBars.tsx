@@ -1,11 +1,14 @@
 import { useRef } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
 type AudioBarsProps = {
-  data: number[];
   width: number;
 };
 
-const AudioBars = ({ data, width }: AudioBarsProps) => {
+const AudioBars = ({ width }: AudioBarsProps) => {
+   const dispatch = useDispatch();
+   const data = useSelector((state: any) => state.audio.rawData);
+
    const gradientRef = useRef<SVGLinearGradientElement>(null);
 
    const barWidth = 8;
@@ -32,7 +35,7 @@ const AudioBars = ({ data, width }: AudioBarsProps) => {
                <stop offset="1" stopColor="rgb(18,236,246)" stopOpacity="1" />
             </linearGradient>
          </defs>
-         {data.map((value, index) => (
+         {data.map((value: number, index: number) => (
             <rect
                key={index}
                x={index * (barWidth + barSpacing)}

@@ -31,6 +31,9 @@ const SearchDeezer = () => {
    // (redux store) The 8 tracks infos returned by the Deezer API
    const trackInfo = useSelector((state: audioSliceProps) => state.audio.trackInfo);
 
+   // (redux store) The current clicked track
+   const clickedTrack = useSelector((state: audioSliceProps) => state.audio.clickedTrack);
+
    // Handle the input change
    const handleInputChange = useCallback(
       (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -82,9 +85,9 @@ const SearchDeezer = () => {
 
             }
          </div>
-         {/* {QuerySearch && (
-            <AudioPlayer trackInfo={selectedTrack}  />
-         )} */}
+         {clickedTrack && (
+            <AudioPlayer />
+         )}
 
       </div>
    );

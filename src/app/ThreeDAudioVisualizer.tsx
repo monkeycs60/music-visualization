@@ -2,12 +2,11 @@ import { Canvas } from '@react-three/fiber';
 import { scaleLinear, scalePow } from 'd3-scale';
 import { useMemo } from 'react';
 import * as THREE from 'three';
+import { useDispatch, useSelector } from 'react-redux';
 
-type ThreeDAudioVisualizerProps = {
-  rawData: number[];
-};
-
-const ThreeDAudioVisualizer = ({ rawData }: ThreeDAudioVisualizerProps) => {
+const ThreeDAudioVisualizer = () => {
+   const dispatch = useDispatch();
+   const rawData = useSelector((state: any) => state.audio.rawData);
    const maxFrequency = 255;
 
    const colorScale = scaleLinear<string>()
@@ -20,7 +19,7 @@ const ThreeDAudioVisualizer = ({ rawData }: ThreeDAudioVisualizerProps) => {
       .exponent(1.3);
 
    const bars = useMemo(() => {
-      return rawData.map((frequency, index) => {
+      return rawData.map((frequency: number, index: number) => {
          const height = heightScale(frequency);
          const color = colorScale(frequency);
 
@@ -35,7 +34,7 @@ const ThreeDAudioVisualizer = ({ rawData }: ThreeDAudioVisualizerProps) => {
 
    return (
       <Canvas camera={{ position: [0, 0, 150], fov: 75 }}>
-         {bars.map((bar) => (
+         {bars.map((bar: any) => (
             <mesh key={bar.key} position={new THREE.Vector3(...bar.position)} scale={[1, bar.height, 1]}>
                <boxGeometry args={[1, 1, 1]} />
                <meshStandardMaterial color={bar.color} />
